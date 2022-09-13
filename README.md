@@ -8,6 +8,8 @@ This demonstration provides a reference for implementing a Model Factory in Clou
 
 A Model Factory is a common Machine Learning Engineering pattern to enable the continuous creation and maintenance of production models. It consists of a sequential workflow to incrementally refine models as new datasets and features are created.
 
+Key benefits include the ability to deploy and scale machine learning use cases faster and at lower cost; the ability to turn a model concept into a long term value generating asset in a large organization; and the ability to free up Data Scientists and Engineers hours so they can focus on new use cases rather than maintaining existing ones.  
+
 CML has extensive MLOps features and a set of model and lifecycle management capabilities to enable the repeatable, transparent, and governed approaches necessary for scaling model deployments and ML use cases.
 
 ## Requirements
@@ -22,6 +24,7 @@ The Model Factory pattern relies on the below foundations:
 * Heavy reliance on standardization and "dev ops" style continuous operations in the context of a governed, reproducible, and highly observable ML Ops environment.
 * An incremental workflow starting with a clear baseline and reproducible instances of subsequent model versions.
 * A continuous monitoring system based on logged model performance metrics that can flag outdated model versions with automated tests (e.g. an A/B test)
+* Using pre-trained machine learning models, especially in the initial phases such as when deploying a model baseline.
 
 Some of the benefits of implementing this pattern in CML include:
 
