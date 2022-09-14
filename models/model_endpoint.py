@@ -1,7 +1,7 @@
 # ###########################################################################
 #
 #  CLOUDERA APPLIED MACHINE LEARNING PROTOTYPE (AMP)
-#  (C) Cloudera, Inc. 2021
+#  (C) Cloudera, Inc. 2022
 #  All rights reserved.
 #
 #  Applicable Open Source License: Apache 2.0
@@ -38,217 +38,64 @@
 #
 # ###########################################################################
 
-## Part 5: Model Serving
-#
-# This notebook explains how to create and deploy Models in CML which function as a
-# REST API to serve predictions. This feature makes it very easy for a data scientist
-# to make trained models available and usable to other developers and data scientists
-# in your organization.
-#
-# In the last part of the series, you learned:
-# - the requirements for running an Experiment
-# - how to set up a new Experiment
-# - how to monitor the results of an Experiment
-# - limitations of the feature
-#
-# In this part, you will learn:
-# - the requirements for creating and deploying a Model
-# - how to deploy a Model
-# - how to test and use a Model
-# - limitations of the feature
-#
-# If you haven't yet, run through the initialization steps in the README file and Part 1.
-# In Part 1, the data is imported into the table you specified in Hive.
-# All data accesses fetch from Hive.
-#
-### Requirements
-# Models have the same requirements as Experiments:
-# - model code in a `.py` script, not a notebook
-# - a `requirements.txt` file listing package dependencies
-# - a `cdsw-build.sh` script containing code to install all dependencies
-#
-# > In addition, Models *must* be designed with one main function that takes a dictionary as its sole argument
-# > and returns a single dictionary.
-# > CML handles the JSON serialization and deserialization.
-
-# In this file, there is minimal code since calculating predictions is much simpler
-# than training a machine learning model.
-# Once again, we use the `ExplainedModel` helper class in `churnexplainer.py`.
-# When a Model API is called, CML will translate the input and returned JSON blobs to and from python dictionaries.
-# Thus, the script simply loads the model we saved at the end of the last notebook,
-# passes the input dictionary into the model, and returns the results as a dictionary with the following format:
-#
-#    {
-#        'data': dict(data),
-#        'probability': probability,
-#        'explanation': explanation
-#    }
-#
-# The Model API will return this dictionary serialized as JSON.
-#
-### Model Operations
-#
-# This model is deployed using the model operations feature of CML which consists of
-# [Model Metrics](https://docs.cloudera.com/machine-learning/cloud/model-metrics/topics/ml-enabling-model-metrics.html)
-# and [Model Governance](https://docs.cloudera.com/machine-learning/cloud/model-governance/topics/ml-enabling-model-governance.html)
-#
-# The first requirement to make the model use the model metrics feature by adding the
-# `@cdsw.model_metrics` [Python Decorator](https://wiki.python.org/moin/PythonDecorators)
-# before the fuction.
-#
-# Then you can use the *`cdsw.track_metric`* function to add additional
-# data to the underlying database for each call made to the model.
-# **Note:** `cdsw.track_metric` has different functionality depening on if its being
-# used in an *Experiment* or a *Model*.
-#
-# More detail is available
-# using the `help(cdsw.track_mertic)` function
-# ```
-# help(cdsw.track_metric)
-# Help on function track_metric in module cdsw:
-#
-# track_metric(key, value)
-#    Description
-#    -----------
-#
-#    Tracks a metric for an experiment or model deployment
-#        Example:
-#            model deployment usage:
-#                >>>@cdsw.model_metrics
-#                >>>predict_func(args):
-#                >>>   cdsw.track_metric("input_args", args)
-#                >>>   return {"result": "prediction"}
-#
-#            experiment usage:
-#                >>>cdsw.track_metric("input_args", args)
-#
-#    Parameters
-#    ----------
-#    key: string
-#        The metric key to track
-#    value: string, boolean, numeric
-#        The metric value to track
-# ```
-#
-#
-### Creating and deploying a Model
-# To create a Model using our `5_model_serve_explainer.py` script, use the following settings:
-# * **Name**: Explainer
-# * **Description**: Explain customer churn prediction
-# * **File**: `5_model_serve_explainer.py`
-# * **Function**: explain
-# * **Input**:
-# ```
-# {
-# 	"StreamingTV": "No",
-# 	"MonthlyCharges": 70.35,
-# 	"PhoneService": "No",
-# 	"PaperlessBilling": "No",
-# 	"Partner": "No",
-# 	"OnlineBackup": "No",
-# 	"gender": "Female",
-# 	"Contract": "Month-to-month",
-# 	"TotalCharges": 1397.475,
-# 	"StreamingMovies": "No",
-# 	  "DeviceProtection": "No",
-# 	  "PaymentMethod": "Bank transfer (automatic)",
-# 	  "tenure": 29,
-# 	  "Dependents": "No",
-# 	  "OnlineSecurity": "No",
-# 	  "MultipleLines": "No",
-# 	  "InternetService": "DSL",
-# 	  "SeniorCitizen": "No",
-# 	  "TechSupport": "No"
-# }
-# ```
-# * **Kernel**: Python 3
-# * **Engine Profile**: 1 vCPU / 2 GiB Memory
-#
-# The rest can be left as is.
-#
-# After accepting the dialog, CML will *build* a new Docker image using `cdsw-build.sh`,
-# then *assign an endpoint* for sending requests to the new Model.
-
-## Testing the Model
-# > To verify it's returning the right results in the format you expect, you can
-# > test any Model from it's *Overview* page.
-#
-# If you entered an *Example Input* before, it will be the default input here,
-# though you can enter your own.
-
-## Using the Model
-#
-# > The *Overview* page also provides sample `curl` or Python commands for calling your Model API.
-# > You can adapt these samples for other code that will call this API.
-#
-# This is also where you can find the full endpoint to share with other developers
-# and data scientists.
-#
-# **Note:** for security, you can specify
-# [Model API Keys](https://docs.cloudera.com/machine-learning/cloud/models/topics/ml-model-api-key-for-models.html)
-# to add authentication.
-
-## Limitations
-#
-# Models do have a few limitations that are important to know:
-# - re-deploying or re-building Models results in Model downtime (usually brief)
-# - re-starting CML does not automatically restart active Models
-# - Model logs and statistics are only preserved so long as the individual replica is active
-#
-# A current list of known limitations are
-# [documented here](https://docs.cloudera.com/machine-learning/cloud/models/topics/ml-models-known-issues-and-limitations.html).
-
-### Place holder ###
-
-import cdsw, numpy, sklearn
-from cmlapi.utils import Cursor
-from sklearn.linear_model import LogisticRegression
-from joblib import dump, load
 import pandas as pd
-import json
+import numpy as np
+import onnxruntime
+import onnxmltools
+import onnx
+import json, shutil, os
+import cdsw
 
-clf = load('/home/cdsw/models/logreg.joblib')
-
-#data = {
-#  "acc_now_delinq": "1",
-#  "acc_open_past_24mths": "2",
-#  "annual_inc": "3",
-#  "avg_cur_bal": "4",
-#  "funded_amnt": "5"
+### Sample Input Data
+#input_data = {
+#  "acc_now_delinq": "4",
+#  "acc_open_past_24mths": "329.08",
+#  "annual_inc": "1",
+#  "avg_cur_bal": "1",
+#  "funded_amnt": "1"
 #}
 
+model_path = onnx.load("models/model.onnx").SerializeToString()
+
+so = onnxruntime.SessionOptions()
+so.add_session_config_entry('model.onnx', 'ONNX')
+
+session = onnxruntime.InferenceSession(model_path)
+output = session.get_outputs()[0] 
+inputs = session.get_inputs()
+
 @cdsw.model_metrics
-def predict(data):
+def run(input_data):
     
-    df = pd.DataFrame(data, index=[0])
+    # Reformatting Input
+    df = pd.DataFrame(input_data, index=[0])
     df.columns = ['acc_now_delinq', 'acc_open_past_24mths', 'annual_inc', 'avg_cur_bal', 'funded_amnt']
-
-    df = df.astype('float')
-
-    tracked_data = df.astype('str').to_dict('records')[0]
-
-    prediction = str(clf.predict(df)[0])
+    df['acc_now_delinq'] = df['acc_now_delinq'].astype(float)
+    df['acc_open_past_24mths'] = df['acc_open_past_24mths'].astype(float)
+    df['annual_inc'] = df['annual_inc'].astype(float)
+    df['avg_cur_bal'] = df['avg_cur_bal'].astype(float)
+    df['funded_amnt'] = df['funded_amnt'].astype(float)
     
-    # Track prediction
-    cdsw.track_metric("prediction", str(prediction))
+    # ONNX Scoring
+    try:
+        input_data= {i.name: v for i, v in zip(inputs, df.values.reshape(len(inputs),1,1).astype(np.float32))}
+        output = session.run(None, input_data)
+        pred = pd.DataFrame(output)[0][0]
+        
+        #cdsw.track_metric("input_data", input_data)
+        cdsw.track_metric("prediction", pred)
+        
+        data = df.astype('str').to_dict('records')[0]
     
-    cdsw.track_metric("data", df.to_json())
+        # Track prediction
+        cdsw.track_metric("prediction", str(pred))
     
-    return {'input_data': str(tracked_data), 'prediction': str(prediction)}
+        cdsw.track_metric("data", df.to_json())
+    
+        return {'input_data': str(data), 'prediction': str(pred)}
+        
 
-# To test this is a session, comment out the `@cdsw.model_metrics`  line,
-# uncomment the and run the two rows below.
-# x={"StreamingTV":"No","MonthlyCharges":70.35,"PhoneService":"No","PaperlessBilling":"No","Partner":"No","OnlineBackup":"No","gender":"Female","Contract":"Month-to-month","TotalCharges":1397.475,"StreamingMovies":"No","DeviceProtection":"No","PaymentMethod":"Bank transfer (automatic)","tenure":29,"Dependents":"No","OnlineSecurity":"No","MultipleLines":"No","InternetService":"DSL","SeniorCitizen":"No","TechSupport":"No"}
-# explain(x)
-
-## Wrap up
-#
-# We've now covered all the steps to **deploying and serving Models**, including the
-# requirements, limitations, and how to set up, test, and use them.
-# This is a powerful way to get data scientists' work in use by other people quickly.
-#
-# In the next part of the project we will explore how to launch a **web application**
-# served through CML.
-# Your team is busy building models to solve problems.
-# CML-hosted Applications are a simple way to get these solutions in front of
-# stakeholders quickly.
+    except Exception as e:
+        result_dict = {"error": str(e)}
+    
+    return result_dict

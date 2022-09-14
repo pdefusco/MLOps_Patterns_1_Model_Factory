@@ -1,7 +1,7 @@
 # ###########################################################################
 #
 #  CLOUDERA APPLIED MACHINE LEARNING PROTOTYPE (AMP)
-#  (C) Cloudera, Inc. 2021
+#  (C) Cloudera, Inc. 2022
 #  All rights reserved.
 #
 #  Applicable Open Source License: Apache 2.0
@@ -38,43 +38,7 @@
 #
 # ###########################################################################
 
-## Part 7b - Model Operations - Visualising Model Metrics
-
-# This is a continuation of the previous process started in the
-# `7a_ml_ops_simulations.py` script.
-# Here we will load in the metrics saved to the model database in the previous step
-# into a Pandas dataframe, and display different features as graphs.
-
-# ```python
-# help(cdsw.read_metrics)
-# Help on function read_metrics in module cdsw:
-#
-# read_metrics(model_deployment_crn=None, start_timestamp_ms=None, end_timestamp_ms=None, model_crn=None, model_build_crn=None)
-#    Description
-#    -----------
-#
-#    Read metrics data for given Crn with start and end time stamp
-#
-#    Parameters
-#    ----------
-#    model_deployment_crn: string
-#        model deployment Crn
-#    model_crn: string
-#        model Crn
-#    model_build_crn: string
-#        model build Crn
-#    start_timestamp_ms: int, optional
-#        metrics data start timestamp in milliseconds , if not passed
-#        default value 0 is used to fetch data
-#    end_timestamp_ms: int, optional
-#        metrics data end timestamp in milliseconds , if not passed
-#        current timestamp is used to fetch data
-#
-#    Returns
-#    -------
-#    object
-#        metrics data
-# ```
+!pip3 install -r requirements.txt
 
 import cdsw, time, os
 import pandas as pd
