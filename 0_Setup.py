@@ -75,7 +75,7 @@ try:
     df = df.limit(2000)
     
     #Creating table for batch load if not present
-    df.writeTo("default.default.mlops_batch_load_table").create()
+    df.writeTo("default.mlops_batch_load_table").create()
     
 except:
     sparkDF = spark.sql("SELECT * FROM default.mlops_batch_load_table")
