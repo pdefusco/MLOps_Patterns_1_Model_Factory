@@ -6,7 +6,6 @@ git+https://github.com/fastforwardlabs/cmlbootstrap#egg=cmlbootstrap
 numpy
 petastorm
 seaborn
-handyspark
 onnxruntime
 onnxmltools
 onnx
