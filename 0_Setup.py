@@ -67,7 +67,7 @@ spark = SparkSession.builder\
 #Explore putting GE here to unit test column types
 try:
     # Load and parse the data file, converting it to a DataFrame.
-    spark.read.csv(os.environ["STORAGE"]+'/datalake/model_factory/LoanStats_2015_subset_091322.csv',   
+    df = spark.read.csv(os.environ["STORAGE"]+'/datalake/model_factory/LoanStats_2015_subset_091322.csv',   
         header=True,
         sep=',',
         nullValue='NA')
