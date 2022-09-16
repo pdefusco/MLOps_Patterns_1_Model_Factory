@@ -75,35 +75,12 @@ try:
     df = df.limit(2000)
     
     #Creating table for batch load if not present
-    df.writeTo("default.mlops_batch_load_table").create()
+    df.writeTo("default.batch_load_table").create()
     
 except:
-    sparkDF = spark.sql("SELECT * FROM default.mlops_batch_load_table")
+    sparkDF = spark.sql("SELECT * FROM default.batch_load_table")
 
 else:
-    sparkDF = spark.sql("SELECT * FROM default.mlops_batch_load_table")
+    sparkDF = spark.sql("SELECT * FROM default.batch_load_table")
     
-    
-print("Total row count in the target table before batch load")
-sparkDF.count()
-
-newBatchDF = sparkDF.sample(withReplacement=True, fraction=0.5)
-
-newBatchDF.count()
-
-#spark.sql("DROP TABLE IF EXISTS spark_catalog.default.mlops_staging_table")
-
-
-#Explore putting GE here to unit test column types
-try:
-    newBatchDF.writeTo("default.mlops_staging_table").create()
-except:
-    spark.sql("INSERT INTO mlops_batch_load_table SELECT * FROM default.mlops_staging_table").show()
-else:
-    spark.sql("INSERT INTO mlops_batch_load_table SELECT * FROM default.mlops_staging_table").show()
-
-spark.sql("DROP TABLE IF EXISTS default.mlops_staging_table")
-
-print("Total row count in the target table after batch load")
-print(sparkDF.count())
 

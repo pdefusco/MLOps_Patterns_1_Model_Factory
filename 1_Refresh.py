@@ -26,10 +26,10 @@ try:
     
     
 except:
-    sparkDF = spark.sql("SELECT * FROM default.mlops_batch_load_table")
+    sparkDF = spark.sql("SELECT * FROM default.batch_load_table")
 
 else:
-    sparkDF = spark.sql("SELECT * FROM default.mlops_batch_load_table")
+    sparkDF = spark.sql("SELECT * FROM default.batch_load_table")
     
 print("Total row count in the target table before batch load")
 sparkDF.count()
@@ -42,13 +42,8 @@ newBatchDF.count()
 
 #Explore putting GE here to unit test column types
 try:
-    newBatchDF.writeTo("default.mlops_staging_table").create()
+    newBatchDF.writeTo("default.batch_load_table").create()
 except:
-    spark.sql("INSERT INTO mlops_batch_load_table SELECT * FROM default.mlops_staging_table").show()
+    spark.sql("INSERT INTO batch_load_table SELECT * FROM default.batch_load_table").show()
 else:
-    spark.sql("INSERT INTO mlops_batch_load_table SELECT * FROM default.mlops_staging_table").show()
-
-spark.sql("DROP TABLE IF EXISTS default.mlops_staging_table")
-
-print("Total row count in the target table after batch load")
-print(sparkDF.count())
+    spark.sql("INSERT INTO batch_load_table SELECT * FROM default.batch_load_table").show()
