@@ -56,35 +56,25 @@ spark = SparkSession.builder\
   .getOrCreate()
 
 #Explore putting GE here
-sparkDF = spark.sql("SELECT * FROM default.mlops_batch_load_table") #mlops_batch_load_table
+sparkDF = spark.sql("SELECT * FROM default.batch_load_table") #mlops_batch_load_table
 
 #Put open source model registry call here
-mPath = os.environ["STORAGE"]+"/data/newdir"
+mPath = os.environ["STORAGE"]+"/datalake/pdefusco/pipeline"
 persistedModel = PipelineModel.load(mPath)
 
 df_model = persistedModel.transform(sparkDF)
 
-#Push this method to utils 
-def get_confusion_matrix(spark_df):
+# Extract the summary from the instance of LogisticRegressionModel
+trainingSummary = pipelineModel.stages[-1].summary
 
-    input_data = spark_df.rdd.map(lambda x: (x["label"], x["prediction"], float(x["probability"][1])))
-    predictions = spark.createDataFrame(input_data, ["label", "prediction", "probability"])
-
-    y_true = predictions.select(['label']).collect()
-    y_pred = predictions.select(['prediction']).collect()
-
-    print(classification_report(y_true, y_pred))
-    cf_matrix = confusion_matrix(y_true, y_pred, labels=None, sample_weight=None, normalize=None)
-        
-    group_names = ["True Neg","False Pos","False Neg","True Pos"]
-    group_counts = ["{0:0.0f}".format(value) for value in
-                    cf_matrix.flatten()]
-    group_percentages = ["{0:.2%}".format(value) for value in
-                         cf_matrix.flatten()/np.sum(cf_matrix)]
-    labels = [f"{v1}\n{v2}\n{v3}" for v1, v2, v3 in
-              zip(group_names,group_counts,group_percentages)]
-    labels = np.asarray(labels).reshape(2,2)
-    sns.heatmap(cf_matrix, annot=labels, fmt="", cmap='Blues')
+accuracy = trainingSummary.accuracy
+falsePositiveRate = trainingSummary.weightedFalsePositiveRate
+truePositiveRate = trainingSummary.weightedTruePositiveRate
+fMeasure = trainingSummary.weightedFMeasure()
+precision = trainingSummary.weightedPrecision
+recall = trainingSummary.weightedRecall
+print("Accuracy: %s\nFPR: %s\nTPR: %s\nF-measure: %s\nPrecision: %s\nRecall: %s"
+      % (accuracy, falsePositiveRate, truePositiveRate, fMeasure, precision, recall))
 
 get_confusion_matrix(df_model)
 
