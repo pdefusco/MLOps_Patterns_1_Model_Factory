@@ -22,9 +22,9 @@ Step by step instructions to reproduce in your own environment are included belo
 The Model Factory pattern relies on the below foundations:
 
 * Heavy reliance on standardization and "dev ops" style continuous operations in the context of a governed, reproducible, and highly observable ML Ops environment.
-* An incremental workflow starting with a clear baseline and reproducible instances of subsequent model versions.
-* A continuous monitoring system based on logged model performance metrics that can flag outdated model versions with automated tests (e.g. an A/B test)
-* Using pre-trained machine learning models, especially in the initial phases such as when deploying a model baseline.
+* An incremental workflow starting with a clear baseline and a sequential workflow of model versions improving upon the baseline.
+* A continuous monitoring system that can flag outdated model versions with automated tests (e.g. an A/B test) based on logged model performance metrics.
+* Optionally, using pre-trained machine learning models, especially in the initial phases such as when deploying a model baseline.
 
 Some of the benefits of implementing this pattern in CML include:
 
