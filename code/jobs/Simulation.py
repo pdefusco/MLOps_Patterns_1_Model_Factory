@@ -32,7 +32,7 @@ spark = SparkSession.builder\
   .getOrCreate()
 
 #Explore putting GE here
-sparkDF = spark.sql("SELECT * FROM spark_catalog.default.mlops_batch_load_table LIMIT 300")
+sparkDF = spark.sql("SELECT * FROM default.batch_load_table LIMIT 500")
 
 df = sparkDF.toPandas()
 

@@ -56,15 +56,44 @@ spark = SparkSession.builder\
   .getOrCreate()
 
 #Explore putting GE here
-sparkDF = spark.sql("SELECT * FROM default.batch_load_table") #mlops_batch_load_table
+df = spark.sql("SELECT * FROM default.batch_load_table") #mlops_batch_load_table
 
 #Put open source model registry call here
 mPath = os.environ["STORAGE"]+"/datalake/pdefusco/pipeline"
 persistedModel = PipelineModel.load(mPath)
 
-df_model = persistedModel.transform(sparkDF)
+###Data Pipeline###
 
-# Extract the summary from the instance of LogisticRegressionModel
+#Target Feature
+df = df.withColumn("label", when((df["loan_status"] == "Charged Off")|(df["loan_status"] == "Default"), 1).otherwise(0))
+
+#Data Transformations:
+
+df = df.select(['acc_now_delinq', 'acc_open_past_24mths', 'addr_state', 'annual_inc', 'avg_cur_bal', 'funded_amnt', 'label'])
+
+df = df.na.drop(subset=["addr_state"])
+
+li=["TX","CA","FL", "CO"]
+df = df.filter(df.addr_state.isin(li))
+
+df = df.fillna(0)
+
+#Checking Nulls
+from pyspark.sql.functions import col,isnan, when, count
+df.select([count(when(isnan(c) | col(c).isNull(), c)).alias(c) for c in df.columns]).show()
+
+#Data Type Transformations
+df = df.withColumn("acc_now_delinq", df["acc_now_delinq"].cast(FloatType()))
+df = df.withColumn("acc_open_past_24mths", df["acc_open_past_24mths"].cast(FloatType()))
+df = df.withColumn("annual_inc", df["annual_inc"].cast(FloatType()))
+df = df.withColumn("avg_cur_bal", df["avg_cur_bal"].cast(FloatType()))
+df = df.withColumn("funded_amnt", df["funded_amnt"].cast(FloatType()))
+df = df.withColumn("label", df["label"].cast(FloatType()))
+
+###Machine Learning Pipeline###
+df_model = persistedModel.transform(df)
+
+#Model Evaluation
 trainingSummary = pipelineModel.stages[-1].summary
 
 accuracy = trainingSummary.accuracy
