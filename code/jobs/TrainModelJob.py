@@ -92,10 +92,10 @@ df = df.withColumn("funded_amnt", df["funded_amnt"].cast(FloatType()))
 df = df.withColumn("label", df["label"].cast(FloatType()))
 
 ###Machine Learning Pipeline###
-df_model = persistedModel.transform(df)
+pred_df = persistedModel.transform(df)
 
 #Model Evaluation
-trainingSummary = pipelineModel.stages[-1].summary
+trainingSummary = persistedModel.stages[-1].summary
 
 accuracy = trainingSummary.accuracy
 falsePositiveRate = trainingSummary.weightedFalsePositiveRate
@@ -106,7 +106,7 @@ recall = trainingSummary.weightedRecall
 print("Accuracy: %s\nFPR: %s\nTPR: %s\nF-measure: %s\nPrecision: %s\nRecall: %s"
       % (accuracy, falsePositiveRate, truePositiveRate, fMeasure, precision, recall))
 
-get_confusion_matrix(df_model)
+
 
 #try:
 #    df_model.writeTo("spark_catalog.default.mlops_staging_scores_table").create()
