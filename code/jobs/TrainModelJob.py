@@ -106,8 +106,6 @@ recall = trainingSummary.weightedRecall
 print("Accuracy: %s\nFPR: %s\nTPR: %s\nF-measure: %s\nPrecision: %s\nRecall: %s"
       % (accuracy, falsePositiveRate, truePositiveRate, fMeasure, precision, recall))
 
-
-
 #try:
 #    df_model.writeTo("spark_catalog.default.mlops_staging_scores_table").create()
 #    df_model.writeTo("spark_catalog.default.mlops_scores_table").create()
