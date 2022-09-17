@@ -46,9 +46,10 @@ import numpy as np
 import os
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
-import matplotlib.pyplot as plt
-from pyspark.ml.pipeline import PipelineModel
+from pyspark.ml.pipeline import PipelineModel, Pipeline
 from sklearn.metrics import classification_report, confusion_matrix
+from pyspark.sql.types import IntegerType, FloatType, StringType
+from pyspark.ml.feature import IndexToString, StringIndexer, VectorIndexer
 
 spark = SparkSession.builder\
   .appName("1.1 - Retrain Model") \
@@ -107,7 +108,7 @@ print("Accuracy: %s\nFPR: %s\nTPR: %s\nF-measure: %s\nPrecision: %s\nRecall: %s"
 
 get_confusion_matrix(df_model)
 
-#try: 
+#try:
 #    df_model.writeTo("spark_catalog.default.mlops_staging_scores_table").create()
 #    df_model.writeTo("spark_catalog.default.mlops_scores_table").create()
 #except:
