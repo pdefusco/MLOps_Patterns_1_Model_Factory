@@ -1,4 +1,4 @@
-# MLOps Patterns 1: Model Factory
+# MLOps Patterns: Model Factory
 
 # This project is WIP
 
